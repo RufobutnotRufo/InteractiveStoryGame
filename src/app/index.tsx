@@ -1,98 +1,94 @@
-import * as Device from 'expo-device';
-import { Platform, StyleSheet } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
+import { useEffect, useRef } from 'react';
+import { ScrollView, StyleSheet } from 'react-native';
+import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { AnimatedIcon } from '@/components/animated-icon';
-import { HintRow } from '@/components/hint-row';
-import { ThemedText } from '@/components/themed-text';
+import { ChoiceButton } from '@/components/quest/choice-button';
+import { EndingCard } from '@/components/quest/ending-card';
+import { QuestHeader } from '@/components/quest/quest-header';
+import { SceneCard } from '@/components/quest/scene-card';
 import { ThemedView } from '@/components/themed-view';
-import { WebBadge } from '@/components/web-badge';
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
+import { MaxContentWidth, Spacing } from '@/constants/theme';
+import { useQuest } from '@/hooks/use-quest';
 
-function getDevMenuHint() {
-  if (Platform.OS === 'web') {
-    return <ThemedText type="small">use browser devtools</ThemedText>;
-  }
-  if (Device.isDevice) {
-    return (
-      <ThemedText type="small">
-        shake device or press <ThemedText type="code">m</ThemedText> in terminal
-      </ThemedText>
-    );
-  }
-  const shortcut = Platform.OS === 'android' ? 'cmd+m (or ctrl+m)' : 'cmd+d';
+/** Badges shown on the left of each choice button (A, B, C, ...). */
+const CHOICE_BADGES = ['A', 'B', 'C', 'D'];
+
+export default function QuestScreen() {
+  const { node, steps, progress, isEnding, choose, restart } = useQuest();
+  const scrollRef = useRef<ScrollView>(null);
+
+  // New scene → jump back to the top so long text always starts fresh.
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ y: 0, animated: false });
+  }, [node.id]);
+
   return (
-    <ThemedText type="small">
-      press <ThemedText type="code">{shortcut}</ThemedText>
-    </ThemedText>
-  );
-}
+    <ThemedView style={styles.screen}>
+      <StatusBar style="light" />
+      <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
+        <QuestHeader chapter={node.chapter} steps={steps} progress={progress} isEnding={isEnding} />
 
-export default function HomeScreen() {
-  return (
-    <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
-        <ThemedView style={styles.heroSection}>
-          <AnimatedIcon />
-          <ThemedText type="title" style={styles.title}>
-            Welcome to&nbsp;Expo
-          </ThemedText>
-        </ThemedView>
+        <ScrollView
+          ref={scrollRef}
+          style={styles.scroll}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}>
+          <Animated.View key={node.id} entering={FadeIn.duration(280)} style={styles.item}>
+            <SceneCard node={node} />
+          </Animated.View>
+        </ScrollView>
 
-        <ThemedText type="code" style={styles.code}>
-          get started
-        </ThemedText>
-
-        <ThemedView type="backgroundElement" style={styles.stepContainer}>
-          <HintRow
-            title="Try editing"
-            hint={<ThemedText type="code">src/app/index.tsx</ThemedText>}
-          />
-          <HintRow title="Dev tools" hint={getDevMenuHint()} />
-          <HintRow
-            title="Fresh start"
-            hint={<ThemedText type="code">npm run reset-project</ThemedText>}
-          />
-        </ThemedView>
-
-        {Platform.OS === 'web' && <WebBadge />}
+        <Animated.View
+          key={`footer-${node.id}`}
+          entering={FadeInDown.duration(320)}
+          style={styles.footer}>
+          {isEnding && node.ending ? (
+            <EndingCard ending={node.ending} steps={steps} onRestart={restart} />
+          ) : (
+            node.choices?.map((choice, index) => (
+              <ChoiceButton
+                key={choice.label}
+                badge={CHOICE_BADGES[index]}
+                label={choice.label}
+                hint={choice.hint}
+                onPress={() => choose(choice.next)}
+              />
+            ))
+          )}
+        </Animated.View>
       </SafeAreaView>
     </ThemedView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  screen: {
     flex: 1,
-    justifyContent: 'center',
-    flexDirection: 'row',
   },
   safeArea: {
     flex: 1,
+  },
+  scroll: {
+    flex: 1,
+  },
+  scrollContent: {
     paddingHorizontal: Spacing.four,
+    paddingBottom: Spacing.four,
     alignItems: 'center',
-    gap: Spacing.three,
-    paddingBottom: BottomTabInset + Spacing.three,
+  },
+  item: {
+    width: '100%',
     maxWidth: MaxContentWidth,
   },
-  heroSection: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    flex: 1,
+  footer: {
+    width: '100%',
+    maxWidth: MaxContentWidth,
+    alignSelf: 'center',
+    gap: Spacing.two,
     paddingHorizontal: Spacing.four,
-    gap: Spacing.four,
-  },
-  title: {
-    textAlign: 'center',
-  },
-  code: {
-    textTransform: 'uppercase',
-  },
-  stepContainer: {
-    gap: Spacing.three,
-    alignSelf: 'stretch',
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.four,
-    borderRadius: Spacing.four,
+    paddingTop: Spacing.three,
+    paddingBottom: Spacing.two,
   },
 });

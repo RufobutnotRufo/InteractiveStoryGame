@@ -14,14 +14,29 @@ export const Colors = {
     backgroundElement: '#F0F0F3',
     backgroundSelected: '#E0E1E6',
     textSecondary: '#60646C',
+    border: '#D6D9E0',
+    accent: '#4C6FFF',
+    accentSoft: '#E4E9FF',
+    onAccent: '#FFFFFF',
   },
   dark: {
-    text: '#ffffff',
-    background: '#000000',
-    backgroundElement: '#212225',
-    backgroundSelected: '#2E3135',
-    textSecondary: '#B0B4BA',
+    text: '#F5F7FB',
+    background: '#0B0D12',
+    backgroundElement: '#161A23',
+    backgroundSelected: '#212734',
+    textSecondary: '#9BA3B4',
+    border: '#2A3140',
+    accent: '#6E8BFF',
+    accentSoft: '#1D2540',
+    onAccent: '#0B0D12',
   },
+} as const;
+
+/** Accent color per ending tone, used by the ending badge and dot. */
+export const EndingTones = {
+  triumph: '#F0C674',
+  doom: '#E0716E',
+  neutral: '#6E8BFF',
 } as const;
 
 export type ThemeColor = keyof typeof Colors.light & keyof typeof Colors.dark;

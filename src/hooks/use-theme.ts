@@ -8,7 +8,6 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 
 export function useTheme() {
   const scheme = useColorScheme();
-  const theme = scheme === 'unspecified' ? 'light' : scheme;
-
-  return Colors[theme];
+  // The app is dark-first: anything that is not explicitly "light" is dark.
+  return Colors[scheme === 'light' ? 'light' : 'dark'];
 }

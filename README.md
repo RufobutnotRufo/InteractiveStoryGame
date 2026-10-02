@@ -1,6 +1,27 @@
 # Welcome to your Expo app 👋
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+An interactive, text-based quest game for Android (and iOS/web) built with Expo
+Router. Dark, immersive UI: a scene image card, a scrolling narrative block, two
+styled choice buttons, branching story paths and two distinct endings.
+
+## Story & narration
+
+Everything narrative lives in **`src/data/story.ts`** — this is the file to edit:
+
+- `storyData` is a plain object keyed by node id. Each node has `chapter`,
+  `title`, `text`, `image`, and either `choices` (each with a `next` node id) or
+  an `ending` block.
+- `START_NODE_ID` sets the first scene; `STORY_DEPTH` is the longest path and
+  feeds the header progress bar.
+- Images accept a URL string, an `{ uri }` object, or a local
+  `require('@/assets/images/your-scene.png')`. The dummy text uses
+  `placehold.co` placeholder art.
+- `validateStory()` returns a list of broken links/dead ends — handy while you
+  write (e.g. `console.log(validateStory())`).
+
+The engine is `src/hooks/use-quest.ts` (`choose` / `restart` / progress) and the
+UI pieces live in `src/components/quest/`. To support light mode, see the note in
+`src/hooks/use-color-scheme.ts`.
 
 ## Get started
 
@@ -15,6 +36,9 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
    ```bash
    npx expo start
    ```
+
+   Then press `a` to open Android (emulator or connected device), or run
+   `npx expo start --android` directly.
 
 In the output, you'll find options to open the app in a
 
