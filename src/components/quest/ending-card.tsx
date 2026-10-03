@@ -3,17 +3,19 @@ import { Pressable, StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { EndingTones, Spacing } from '@/constants/theme';
-import type { StoryEnding } from '@/data/story';
+import type { StoryEnding } from '@/data/stories';
 import { useTheme } from '@/hooks/use-theme';
 
 type EndingCardProps = {
   ending: StoryEnding;
   steps: number;
   onRestart: () => void;
+  /** Leave the story and return to the story list. */
+  onBackToMenu: () => void;
 };
 
-/** Footer shown on ending nodes: a recap line plus the "Play again" button. */
-export function EndingCard({ ending, steps, onRestart }: EndingCardProps) {
+/** Footer shown on ending nodes: a recap line plus the ending actions. */
+export function EndingCard({ ending, steps, onRestart, onBackToMenu }: EndingCardProps) {
   const theme = useTheme();
   const tone = EndingTones[ending.tone];
   const stepLabel = steps === 1 ? '1 choice' : `${steps} choices`;
@@ -43,10 +45,31 @@ export function EndingCard({ ending, steps, onRestart }: EndingCardProps) {
           </ThemedText>
         </View>
       </Pressable>
+
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel="Back to main menu"
+        onPress={onBackToMenu}
+        style={({ pressed }) => [styles.pressable, pressed && styles.pressed]}>
+        <View
+          style={[
+            styles.button,
+            styles.secondaryButton,
+            { borderColor: theme.border },
+          ]}>
+          <SymbolView
+            name={{ ios: 'list.bullet', android: 'list', web: 'list' }}
+            size={18}
+            tintColor={theme.textSecondary}
+          />
+          <ThemedText type="smallBold" style={styles.buttonText}>
+            All stories
+          </ThemedText>
+        </View>
+      </Pressable>
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     width: '100%',
@@ -75,6 +98,9 @@ const styles = StyleSheet.create({
     gap: Spacing.two,
     paddingVertical: Spacing.three,
     borderRadius: 18,
+  },
+  secondaryButton: {
+    borderWidth: 1,
   },
   buttonText: {
     fontSize: 16,

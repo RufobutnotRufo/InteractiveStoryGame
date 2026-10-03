@@ -1,27 +1,62 @@
 # Welcome to your Expo app 👋
 
 An interactive, text-based quest game for Android (and iOS/web) built with Expo
-Router. Dark, immersive UI: a scene image card, a scrolling narrative block, two
-styled choice buttons, branching story paths and two distinct endings.
+Router. Dark, immersive UI, branching stories with multiple endings, a story
+selection menu and a persisted audio-settings screen.
 
-## Story & narration
+## Architecture
 
-Everything narrative lives in **`src/data/story.ts`** — this is the file to edit:
+```
+src/
+├─ app/                     # Expo Router screens
+│  ├─ _layout.tsx           # Stack + providers (animated transitions)
+│  ├─ index.tsx             # Main menu — story selection
+│  ├─ play.tsx              # Story screen (?storyId=…)
+│  └─ settings.tsx          # Settings (modal presentation)
+├─ data/stories/            # the story dataset
+│  ├─ types.ts              # Story / StoryNode / StoryChoice / StoryEnding
+│  ├─ helpers.ts            # placeholderArt, storyDepth, storyEndings, validateStory
+│  ├─ the-dark-doorway.ts   # quest #1
+│  ├─ emberwood-hollow.ts   # quest #2
+│  └─ index.ts              # `stories`, `getStory(id)`
+├─ hooks/use-quest.ts       # story-agnostic narrative engine
+├─ context/settings-context.tsx
+├─ storage/settings.ts      # AsyncStorage persistence
+├─ lib/audio.ts             # playBGM() / playSFX() placeholders
+└─ components/{ui,menu,settings,quest}/
+```
 
-- `storyData` is a plain object keyed by node id. Each node has `chapter`,
-  `title`, `text`, `image`, and either `choices` (each with a `next` node id) or
-  an `ending` block.
-- `START_NODE_ID` sets the first scene; `STORY_DEPTH` is the longest path and
-  feeds the header progress bar.
-- Images accept a URL string, an `{ uri }` object, or a local
-  `require('@/assets/images/your-scene.png')`. The dummy text uses
-  `placehold.co` placeholder art.
-- `validateStory()` returns a list of broken links/dead ends — handy while you
-  write (e.g. `console.log(validateStory())`).
+- **Main menu** (`app/index.tsx`) lists every entry in `stories` as a card with
+  cover art, synopsis, genre tags and estimated play time, and launches the
+  chosen quest with `router.push({ pathname: '/play', params: { storyId } })`.
+- **Story screen** (`app/play.tsx`) feeds that story into `useQuest()`. Its header
+  has *back to main menu*, *settings* and *pause* controls; the pause menu can
+  resume, open settings, or exit to the menu.
+- **Settings** (`app/settings.tsx`) opens as a modal from both the menu and the
+  pause menu. BGM/SFX toggles and volume sliders persist via AsyncStorage.
 
-The engine is `src/hooks/use-quest.ts` (`choose` / `restart` / progress) and the
-UI pieces live in `src/components/quest/`. To support light mode, see the note in
-`src/hooks/use-color-scheme.ts`.
+## Adding a story
+
+1. Copy the `src/data/stories/_template/` folder → `src/data/stories/my-story/`
+   and edit it. It is a complete, valid story split across two modules
+   (`header.ts` exports the node graph, `tail.ts` imports it and adds the menu
+   metadata) and it is deliberately not registered, so it never appears on the
+   menu. Prefer one file per story? Use `emberwood-hollow.ts` as the shape instead.
+2. Add it to the `stories` array in `src/data/stories/index.ts`. It appears on
+   the menu automatically.
+3. Run `validateStory(myStory)` while writing to catch broken `next` targets.
+
+Nodes use `chapter`, `title`, `text`, `image`, and either `choices` (each with a
+`next` node id) or an `ending` block. Images accept a URL string, an `{ uri }`
+object, or a local `require('@/assets/images/your-scene.png')`; the dummy text
+uses `placehold.co` placeholder art.
+
+## Audio
+
+`src/lib/audio.ts` is a **placeholder** layer: `playBGM()`, `stopBGM()` and
+`playSFX()` log instead of playing. It is already wired to the menu, the pause
+button, choice taps, scene transitions and the settings previews, so connecting
+real assets later is a one-file change (`npx expo install expo-audio`).
 
 ## Get started
 

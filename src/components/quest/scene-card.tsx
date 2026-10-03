@@ -1,33 +1,21 @@
-import { Image } from 'expo-image';
 import { StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
+import { ImageCard } from '@/components/ui/image-card';
 import { EndingTones, Fonts, Spacing } from '@/constants/theme';
-import type { StoryNode } from '@/data/story';
-import { useTheme } from '@/hooks/use-theme';
+import type { StoryNode } from '@/data/stories';
 
-/** The image card + narrative text block for a single scene. */
+/**
+ * The image card + narrative text block for a single scene. The image itself is
+ * handled by the shared `ImageCard`, so a missing/broken URL falls back to a
+ * themed placeholder instead of an empty frame.
+ */
 export function SceneCard({ node }: { node: StoryNode }) {
-  const theme = useTheme();
   const ending = node.ending;
 
   return (
     <View style={styles.card}>
-      <View
-        style={[
-          styles.imageFrame,
-          { backgroundColor: theme.backgroundElement, borderColor: theme.border },
-        ]}>
-        {node.image != null ? (
-          <Image source={node.image} style={styles.image} contentFit="cover" transition={250} />
-        ) : (
-          <View style={styles.imageFallback}>
-            <ThemedText type="small" themeColor="textSecondary">
-              No image for this scene
-            </ThemedText>
-          </View>
-        )}
-
+      <ImageCard source={node.image} ratio={3 / 2} placeholderLabel="Scene artwork">
         <View style={styles.scrim} pointerEvents="none" />
 
         <View style={styles.caption}>
@@ -43,7 +31,7 @@ export function SceneCard({ node }: { node: StoryNode }) {
             </ThemedText>
           )}
         </View>
-      </View>
+      </ImageCard>
 
       <View style={styles.body}>
         <ThemedText style={styles.title}>{node.title}</ThemedText>
@@ -63,23 +51,6 @@ export function SceneCard({ node }: { node: StoryNode }) {
 const styles = StyleSheet.create({
   card: {
     gap: Spacing.four,
-  },
-  imageFrame: {
-    width: '100%',
-    aspectRatio: 3 / 2,
-    borderRadius: 24,
-    borderWidth: 1,
-    overflow: 'hidden',
-    justifyContent: 'center',
-  },
-  image: {
-    width: '100%',
-    height: '100%',
-  },
-  imageFallback: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   scrim: {
     position: 'absolute',
