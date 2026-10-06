@@ -1,9 +1,9 @@
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from "react-native";
 
-import { ThemedText } from '@/components/themed-text';
-import { ImageCard } from '@/components/ui/image-card';
-import { EndingTones, Fonts, Spacing } from '@/constants/theme';
-import type { StoryNode } from '@/data/stories';
+import { ThemedText } from "@/components/themed-text";
+import { ImageCard } from "@/components/ui/image-card";
+import { EndingTones, Fonts, Spacing } from "@/constants/theme";
+import type { StoryNode } from "@/data/stories";
 
 /**
  * The image card + narrative text block for a single scene. The image itself is
@@ -15,12 +15,21 @@ export function SceneCard({ node }: { node: StoryNode }) {
 
   return (
     <View style={styles.card}>
-      <ImageCard source={node.image} ratio={3 / 2} placeholderLabel="Scene artwork">
+      <ImageCard
+        source={node.image}
+        ratio={3 / 2}
+        placeholderLabel="Scene artwork"
+      >
         <View style={styles.scrim} pointerEvents="none" />
 
         <View style={styles.caption}>
           {ending ? (
-            <View style={[styles.pill, { backgroundColor: EndingTones[ending.tone] }]}>
+            <View
+              style={[
+                styles.pill,
+                { backgroundColor: EndingTones[ending.tone] },
+              ]}
+            >
               <ThemedText type="smallBold" style={styles.pillText}>
                 {ending.label}
               </ThemedText>
@@ -53,26 +62,26 @@ const styles = StyleSheet.create({
     gap: Spacing.four,
   },
   scrim: {
-    position: 'absolute',
+    position: "absolute",
     left: 0,
     right: 0,
     bottom: 0,
-    height: '55%',
+    height: "55%",
     experimental_backgroundImage:
-      'linear-gradient(180deg, rgba(11,13,18,0) 0%, rgba(11,13,18,0.92) 100%)',
+      "linear-gradient(180deg, rgba(11,13,18,0) 0%, rgba(11,13,18,0.92) 100%)",
   },
   caption: {
-    position: 'absolute',
+    position: "absolute",
     left: Spacing.three,
     bottom: Spacing.three,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   captionText: {
     fontSize: 12,
     letterSpacing: 2,
-    textTransform: 'uppercase',
-    color: '#FFFFFF',
+    textTransform: "uppercase",
+    color: "#FFFFFF",
   },
   pill: {
     paddingHorizontal: Spacing.two,
@@ -82,19 +91,19 @@ const styles = StyleSheet.create({
   pillText: {
     fontSize: 12,
     letterSpacing: 1,
-    textTransform: 'uppercase',
-    color: '#0B0D12',
+    textTransform: "uppercase",
+    color: "#0B0D12",
   },
   body: {
     gap: Spacing.two,
   },
   title: {
-    fontSize: 26,
+    fontSize: 16,
     lineHeight: 32,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   summary: {
-    fontWeight: '600',
+    fontWeight: "600",
   },
   text: {
     fontFamily: Fonts.serif,
